@@ -56,17 +56,29 @@ const keyMap = {
     home: 272,
 }
 
+/**
+ * 
+ * @link https://stackoverflow.com/questions/8942678/keyboardevent-in-chrome-keycode-is-0
+ * @param {*} el 
+ * @param {*} keyCode 
+ */
+function __triggerKeyboardEvent(el, keyCode) {
+    var eventObj = document.createEventObject ?
+        document.createEventObject() : document.createEvent("Events");
+
+    if (eventObj.initEvent) {
+        eventObj.initEvent("keydown", true, true);
+    }
+
+    eventObj.keyCode = keyCode;
+    eventObj.which = keyCode;
+
+    el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeydown", eventObj);
+
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
+    __triggerKeyboardEvent(document.body, keyMap[msg['posi']])
 
-    document.onkeydown({ keyCode: keyMap[msg['posi']] })
-    // const script = document.createElement('script')
-    // const url = chrome.runtime.getURL("inject.js")
-    // script.src = url
-    // // script.textContent = `document.onkeydown({ keyCode: ${keyMap[msg['posi']]} })`
-    // // script.textContent = `alert(1)`
-    // sessionStorage.setItem('js', 'alert(1)')
-    // console.log(script, url)
-    // document.body.appendChild(script)
-
-
+    response(0)
 });
